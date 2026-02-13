@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Loader2, TrendingUp, Building2, FileText, Key, Eye, EyeOff } from 'lucide-react';
+import React, { useState } from 'react';
+import { Loader2, TrendingUp, Building2, FileText } from 'lucide-react';
 
 export default function CompetitiveAnalysis() {
   const [userInput, setUserInput] = useState('');
@@ -7,53 +7,10 @@ export default function CompetitiveAnalysis() {
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState(null);
   const [error, setError] = useState(null);
-  const [apiKey, setApiKey] = useState('');
-  const [apiKeyStored, setApiKeyStored] = useState(false);
-  const [showApiKey, setShowApiKey] = useState(false);
-  const [tempApiKey, setTempApiKey] = useState('');
-
-  // Check if API key exists in localStorage on mount
-  useEffect(() => {
-    const storedKey = localStorage.getItem('anthropic_api_key');
-    if (storedKey) {
-      setApiKey(storedKey);
-      setApiKeyStored(true);
-    }
-  }, []);
-
-  const saveApiKey = () => {
-    if (!tempApiKey.trim()) {
-      setError('Please enter a valid API key');
-      return;
-    }
-    
-    if (!tempApiKey.startsWith('sk-ant-')) {
-      setError('API key should start with "sk-ant-"');
-      return;
-    }
-
-    localStorage.setItem('anthropic_api_key', tempApiKey);
-    setApiKey(tempApiKey);
-    setApiKeyStored(true);
-    setTempApiKey('');
-    setError(null);
-  };
-
-  const removeApiKey = () => {
-    localStorage.removeItem('anthropic_api_key');
-    setApiKey('');
-    setApiKeyStored(false);
-    setTempApiKey('');
-  };
 
   const generateAnalysis = async () => {
     if (!userInput.trim()) {
       setError('Please enter some input for the analysis');
-      return;
-    }
-
-    if (!apiKey) {
-      setError('Please enter your API key first');
       return;
     }
 
@@ -67,8 +24,6 @@ export default function CompetitiveAnalysis() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": apiKey,
-          "anthropic-version": "2023-06-01"
         },
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
@@ -117,70 +72,6 @@ Format your response in clear sections with bullet points where appropriate.`
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-white to-yellow-50 p-6">
       <div className="max-w-4xl mx-auto">
-        
-        {/* API Key Section */}
-        {!apiKeyStored ? (
-          <div className="bg-white rounded-2xl shadow-lg p-8 mb-6 border-l-4 border-yellow-500">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="bg-yellow-500 p-3 rounded-xl">
-                <Key className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800">Enter Your API Key</h2>
-                <p className="text-gray-600 text-sm mt-1">
-                  Get your key from <a href="https://console.anthropic.com" target="_blank" rel="noopener noreferrer" className="text-yellow-600 hover:underline">console.anthropic.com</a>
-                </p>
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="relative">
-                <input
-                  type={showApiKey ? "text" : "password"}
-                  value={tempApiKey}
-                  onChange={(e) => setTempApiKey(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && saveApiKey()}
-                  placeholder="sk-ant-api03-..."
-                  className="w-full p-4 pr-12 border-2 border-gray-200 rounded-xl focus:border-yellow-500 focus:outline-none transition-colors font-mono text-sm"
-                />
-                <button
-                  onClick={() => setShowApiKey(!showApiKey)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showApiKey ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-              
-              <button
-                onClick={saveApiKey}
-                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-md hover:shadow-lg"
-              >
-                Save API Key
-              </button>
-              
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm">
-                <p className="text-blue-800 font-medium mb-2">🔒 Privacy Note:</p>
-                <p className="text-blue-700">
-                  Your API key is stored locally in your browser and never sent to any server except Anthropic's API.
-                </p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Key className="w-5 h-5 text-green-600" />
-              <span className="text-green-800 font-medium">API Key Configured</span>
-            </div>
-            <button
-              onClick={removeApiKey}
-              className="text-red-600 hover:text-red-700 text-sm font-medium transition-colors"
-            >
-              Remove Key
-            </button>
-          </div>
-        )}
-
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-6 border-t-4 border-yellow-500">
           <div className="flex items-center gap-3 mb-4">
@@ -220,7 +111,7 @@ Format your response in clear sections with bullet points where appropriate.`
             
             <button
               onClick={generateAnalysis}
-              disabled={loading || !userInput.trim() || !apiKeyStored}
+              disabled={loading || !userInput.trim()}
               className="bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold px-8 py-3 rounded-xl flex items-center gap-2 transition-all shadow-md hover:shadow-lg"
             >
               {loading ? (

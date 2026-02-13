@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
-  Grid,
   Typography,
   Card,
   CardContent,
@@ -11,7 +10,7 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
-import { TrendingUp, Building2, FileText } from "lucide-react";
+import { TrendingUp, Building2, FileText, Lock } from "lucide-react";
 
 const CompetitiveAnalysis = () => {
   const [userInput, setUserInput] = useState("");
@@ -19,11 +18,30 @@ const CompetitiveAnalysis = () => {
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState(null);
   const [error, setError] = useState(null);
-  const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
+  const [apiKey, setApiKey] = useState(localStorage.getItem("apiKey") || "");
+  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
+
+  useEffect(() => {
+    setShowApiKeyInput(!apiKey);
+  }, [apiKey]);
+
+  const handleApiKeyChange = (e) => {
+    setApiKey(e.target.value);
+  };
+
+  const saveApiKey = () => {
+    localStorage.setItem("apiKey", apiKey);
+    setShowApiKeyInput(false);
+  };
 
   const generateAnalysis = async () => {
     if (!userInput.trim()) {
       setError("Please enter some input for the analysis");
+      return;
+    }
+    if (!apiKey) {
+      setError("Please enter your API key");
+      setShowApiKeyInput(true);
       return;
     }
 
@@ -32,7 +50,7 @@ const CompetitiveAnalysis = () => {
     setAnalysis(null);
 
     try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      const response = await fetch("/api/v1/messages", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,22 +62,19 @@ const CompetitiveAnalysis = () => {
           messages: [
             {
               role: "user",
-              content: `You are a banking competitive analysis expert. Analyze the following scenario for ${defaultBank}:
-
-User Input: ${userInput}
-
-Please provide a comprehensive competitive analysis that includes:
-1. Market Position: Where ${defaultBank} stands in relation to competitors
-2. Key Competitors: Identify main competitors and their strengths
-3. Competitive Advantages: ${defaultBank}'s unique selling points
-4. Areas for Improvement: Where ${defaultBank} could strengthen its position
-5. Strategic Recommendations: Actionable insights for ${defaultBank}
-
-Format your response in clear sections with bullet points where appropriate.`,
+              content: `You are a banking competitive analysis expert. Analyze the following scenario for ${defaultBank}:\n\nUser Input: ${userInput}\n\nPlease provide a comprehensive competitive analysis that includes:\n1. Market Position: Where ${defaultBank} stands in relation to competitors\n2. Key Competitors: Identify main competitors and their strengths\n3. Competitive Advantages: ${defaultBank}'s unique selling points\n4. Areas for Improvement: Where ${defaultBank} could strengthen its position\n5. Strategic Recommendations: Actionable insights for ${defaultBank}\n\nFormat your response in clear sections with bullet points where appropriate.`,
             },
           ],
         }),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.error?.message ||
+            `API request failed with status ${response.status}`
+        );
+      }
 
       const data = await response.json();
 
@@ -105,8 +120,37 @@ Format your response in clear sections with bullet points where appropriate.`,
         </CardContent>
       </Card>
 
+      {showApiKeyInput && (
+        <Card sx={{ p: 3, mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Enter your Anthropic API Key
+          </Typography>
+          <TextField
+            type="password"
+            value={apiKey}
+            onChange={handleApiKeyChange}
+            fullWidth
+            placeholder="Your API Key"
+            sx={{ mb: 2 }}
+          />
+          <Button
+            onClick={saveApiKey}
+            variant="contained"
+            sx={{ bgcolor: "#004684", "&:hover": { bgcolor: "#003366" } }}
+            startIcon={<Lock size={20} />}
+          >
+            Save API Key
+          </Button>
+        </Card>
+      )}
+
       <Card sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h6" component="label" fontWeight="semibold" gutterBottom>
+        <Typography
+          variant="h6"
+          component="label"
+          fontWeight="semibold"
+          gutterBottom
+        >
           What would you like to analyze?
         </Typography>
         <TextField
@@ -118,18 +162,36 @@ Format your response in clear sections with bullet points where appropriate.`,
           multiline
           rows={4}
           variant="outlined"
+          disabled={showApiKeyInput}
         />
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 2 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mt: 2,
+          }}
+        >
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+          >
             <Building2 size={16} />
             Analysis focused on {defaultBank}
           </Typography>
           <Button
             onClick={generateAnalysis}
-            disabled={loading || !userInput.trim()}
+            disabled={loading || !userInput.trim() || showApiKeyInput}
             variant="contained"
             sx={{ bgcolor: "#004684", "&:hover": { bgcolor: "#003366" } }}
-            startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <FileText size={20} />}
+            startIcon={
+              loading ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                <FileText size={20} />
+              )
+            }
           >
             {loading ? "Analyzing..." : "Generate Analysis"}
           </Button>
@@ -144,7 +206,17 @@ Format your response in clear sections with bullet points where appropriate.`,
 
       {analysis && (
         <Card sx={{ p: 3 }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2, pb: 2, borderBottom: 1, borderColor: "grey.200" }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              mb: 2,
+              pb: 2,
+              borderBottom: 1,
+              borderColor: "grey.200",
+            }}
+          >
             <FileText size={24} color="#004684" />
             <Typography variant="h5" component="h2" fontWeight="bold">
               Analysis Results
@@ -167,14 +239,24 @@ Format your response in clear sections with bullet points where appropriate.`,
         </Card>
       )}
 
-      {!analysis && !loading && (
+      {!analysis && !loading && !showApiKeyInput && (
         <Card sx={{ p: 3, bgcolor: "#FDFCE8", border: `1px solid #FFD200` }}>
-          <Typography variant="h6" fontWeight="semibold" gutterBottom>💡 Tips for Better Analysis</Typography>
+          <Typography variant="h6" fontWeight="semibold" gutterBottom>
+            💡 Tips for Better Analysis
+          </Typography>
           <ul>
-            <li>Be specific about the aspect you want to analyze (e.g., products, services, market segments)</li>
-            <li>Include timeframes if relevant (e.g., "current market position", "trends over the past year")</li>
+            <li>
+              Be specific about the aspect you want to analyze (e.g., products,
+              services, market segments)
+            </li>
+            <li>
+              Include timeframes if relevant (e.g., "current market position",
+              "trends over the past year")
+            </li>
             <li>Mention specific competitors if you have them in mind</li>
-            <li>Ask about specific metrics or KPIs you're interested in</li>
+            <li>
+              Ask about specific metrics or KPIs you're interested in
+            </li>
           </ul>
         </Card>
       )}
