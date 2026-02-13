@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Container,
   Typography,
@@ -10,7 +10,7 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
-import { TrendingUp, Building2, FileText, Lock } from "lucide-react";
+import { TrendingUp, Building2, FileText } from "lucide-react";
 
 const CompetitiveAnalysis = () => {
   const [userInput, setUserInput] = useState("");
@@ -18,30 +18,10 @@ const CompetitiveAnalysis = () => {
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState(null);
   const [error, setError] = useState(null);
-  const [apiKey, setApiKey] = useState(localStorage.getItem("apiKey") || "");
-  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
-
-  useEffect(() => {
-    setShowApiKeyInput(!apiKey);
-  }, [apiKey]);
-
-  const handleApiKeyChange = (e) => {
-    setApiKey(e.target.value);
-  };
-
-  const saveApiKey = () => {
-    localStorage.setItem("apiKey", apiKey);
-    setShowApiKeyInput(false);
-  };
 
   const generateAnalysis = async () => {
     if (!userInput.trim()) {
       setError("Please enter some input for the analysis");
-      return;
-    }
-    if (!apiKey) {
-      setError("Please enter your API key");
-      setShowApiKeyInput(true);
       return;
     }
 
@@ -54,7 +34,6 @@ const CompetitiveAnalysis = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": apiKey,
         },
         body: JSON.stringify({
           model: "claude-3-opus-20240229",
@@ -62,7 +41,7 @@ const CompetitiveAnalysis = () => {
           messages: [
             {
               role: "user",
-              content: `You are a banking competitive analysis expert. Analyze the following scenario for ${defaultBank}:\n\nUser Input: ${userInput}\n\nPlease provide a comprehensive competitive analysis that includes:\n1. Market Position: Where ${defaultBank} stands in relation to competitors\n2. Key Competitors: Identify main competitors and their strengths\n3. Competitive Advantages: ${defaultBank}'s unique selling points\n4. Areas for Improvement: Where ${defaultBank} could strengthen its position\n5. Strategic Recommendations: Actionable insights for ${defaultBank}\n\nFormat your response in clear sections with bullet points where appropriate.`,
+              content: `You are a banking competitive analysis expert. Analyze the following scenario for ${defaultBank}:\n\nUser Input: ${userInput}\n\nPlease provide a comprehensive competitive analysis that includes:\n1. Market Position: Where ${defaultBank} stands in relation to competitors\n2. Key Competitors: Identify main competitors and their strengths\n3. Competitive Advantages: ${defaultBank}\'s unique selling points\n4. Areas for Improvement: Where ${defaultBank} could strengthen its position\n5. Strategic Recommendations: Actionable insights for ${defaultBank}\n\nFormat your response in clear sections with bullet points where appropriate.`,
             },
           ],
         }),
@@ -120,30 +99,6 @@ const CompetitiveAnalysis = () => {
         </CardContent>
       </Card>
 
-      {showApiKeyInput && (
-        <Card sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Enter your Anthropic API Key
-          </Typography>
-          <TextField
-            type="password"
-            value={apiKey}
-            onChange={handleApiKeyChange}
-            fullWidth
-            placeholder="Your API Key"
-            sx={{ mb: 2 }}
-          />
-          <Button
-            onClick={saveApiKey}
-            variant="contained"
-            sx={{ bgcolor: "#004684", "&:hover": { bgcolor: "#003366" } }}
-            startIcon={<Lock size={20} />}
-          >
-            Save API Key
-          </Button>
-        </Card>
-      )}
-
       <Card sx={{ p: 3, mb: 3 }}>
         <Typography
           variant="h6"
@@ -162,7 +117,6 @@ const CompetitiveAnalysis = () => {
           multiline
           rows={4}
           variant="outlined"
-          disabled={showApiKeyInput}
         />
         <Box
           sx={{
@@ -182,7 +136,7 @@ const CompetitiveAnalysis = () => {
           </Typography>
           <Button
             onClick={generateAnalysis}
-            disabled={loading || !userInput.trim() || showApiKeyInput}
+            disabled={loading || !userInput.trim()}
             variant="contained"
             sx={{ bgcolor: "#004684", "&:hover": { bgcolor: "#003366" } }}
             startIcon={
@@ -239,7 +193,7 @@ const CompetitiveAnalysis = () => {
         </Card>
       )}
 
-      {!analysis && !loading && !showApiKeyInput && (
+      {!analysis && !loading && (
         <Card sx={{ p: 3, bgcolor: "#FDFCE8", border: `1px solid #FFD200` }}>
           <Typography variant="h6" fontWeight="semibold" gutterBottom>
             💡 Tips for Better Analysis
@@ -255,7 +209,7 @@ const CompetitiveAnalysis = () => {
             </li>
             <li>Mention specific competitors if you have them in mind</li>
             <li>
-              Ask about specific metrics or KPIs you're interested in
+              Ask about specific metrics or KPIs you\'re interested in
             </li>
           </ul>
         </Card>
