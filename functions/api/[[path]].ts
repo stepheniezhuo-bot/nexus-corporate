@@ -1,5 +1,8 @@
+interface Env {
+  ANTHROPIC_API_KEY: string;
+}
 
-export async function onRequest(context) {
+export const onRequest: PagesFunction<Env> = async (context) => {
   // Get the request from the client
   let request = context.request;
 
