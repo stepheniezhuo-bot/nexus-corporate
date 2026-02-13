@@ -69,36 +69,36 @@ const CustomerDashboard = () => {
             </CardContent>
           </Card>
         </Grid>
-      </Grid>
 
-      {/* Financial Trends */}
-      <Card sx={{ my: 3 }}>
-        <CardContent>
-          <Typography variant="h6">Financials</Typography>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={financialData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="Revenue"
-                stroke="#004684"
-                strokeWidth={2}
-              />
-              <Line
-                type="monotone"
-                dataKey="Profit"
-                stroke="#FFD200"
-                strokeWidth={2}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+        {/* Financial Trends */}
+        <Grid item xs={12}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6">Financials</Typography>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={financialData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="Revenue"
+                    stroke="#004684"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="Profit"
+                    stroke="#FFD200"
+                    strokeWidth={2}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </Grid>
 
-      <Grid container spacing={3}>
         {/* NBA & Conversation Starter */}
         <Grid item xs={12} md={6}>
           {trend && (
