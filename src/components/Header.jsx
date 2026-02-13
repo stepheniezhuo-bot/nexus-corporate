@@ -1,7 +1,8 @@
 import React from "react";
-import { AppBar, Toolbar, Typography, InputBase, Box } from "@mui/material";
+import { AppBar, Toolbar, Typography, InputBase, Box, Button } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
+import { Link as RouterLink } from "react-router-dom";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -51,6 +52,9 @@ const Header = ({ onSearch }) => {
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
           PPSB
         </Typography>
+        <Button color="inherit" component={RouterLink} to="/analysis">
+          Competitive Analysis
+        </Button>
         <Search>
           <SearchIconWrapper>
             <SearchIcon />
