@@ -11,12 +11,6 @@ import {
   Breadcrumbs,
   Link,
   Modal,
-  TextField,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  CircularProgress,
 } from "@mui/material";
 import {
   LineChart,
@@ -42,10 +36,6 @@ const CustomerDashboard = () => {
   const { id } = useParams();
   const client = clients.find((c) => c.id === parseInt(id));
   const [open, setOpen] = useState(false);
-  const [analysisModalOpen, setAnalysisModalOpen] = useState(false);
-  const [analysisQuery, setAnalysisQuery] = useState("");
-  const [analysisResult, setAnalysisResult] = useState(null);
-  const [loading, setLoading] = useState(false);
 
   if (!client) {
     return <Typography>Client not found</Typography>;
@@ -55,27 +45,6 @@ const CustomerDashboard = () => {
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
-  const handleAnalysisModalOpen = () => {
-    setAnalysisModalOpen(true);
-    setAnalysisResult(null);
-  };
-  const handleAnalysisModalClose = () => setAnalysisModalOpen(false);
-
-  const handleAnalysisSubmit = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(
-        `/mcp/securelend-finance?prompt=${encodeURIComponent(analysisQuery)}`
-      );
-      const result = await response.json();
-      setAnalysisResult(result.choices[0].message.content);
-    } catch (error) {
-      console.error("Error fetching analysis:", error);
-      setAnalysisResult("Failed to fetch analysis.");
-    }
-    setLoading(false);
-  };
 
   return (
     <Container sx={{ py: 4 }}>
@@ -156,19 +125,12 @@ const CustomerDashboard = () => {
           )}
         </Grid>
 
-        {/* Market Research & Generate Analysis Buttons */}
+        {/* Market Research Button */}
         <Grid item xs={12}>
           {trend && (
             <Box>
               <Button variant="outlined" onClick={handleOpen}>
                 Market Research
-              </Button>
-              <Button
-                variant="outlined"
-                sx={{ ml: 2 }}
-                onClick={handleAnalysisModalOpen}
-              >
-                Generate Analysis
               </Button>
               <Modal
                 open={open}
@@ -204,58 +166,6 @@ const CustomerDashboard = () => {
                     <br />
                     <strong>News:</strong> {trend.news}
                   </Typography>
-                </Box>
-              </Modal>
-              <Modal
-                open={analysisModalOpen}
-                onClose={handleAnalysisModalClose}
-                aria-labelledby="generate-analysis-modal-title"
-              >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: 500,
-                    bgcolor: "background.paper",
-                    border: "2px solid #000",
-                    boxShadow: 24,
-                    p: 4,
-                  }}
-                >
-                  <Typography
-                    id="generate-analysis-modal-title"
-                    variant="h6"
-                    component="h2"
-                  >
-                    Generate Analysis
-                  </Typography>
-                  {!analysisResult && !loading && (
-                    <>
-                      <TextField
-                        fullWidth
-                        label="What to analyse"
-                        sx={{ mt: 2 }}
-                        value={analysisQuery}
-                        onChange={(e) => setAnalysisQuery(e.target.value)}
-                      />
-                      <Button
-                        variant="contained"
-                        onClick={handleAnalysisSubmit}
-                        sx={{ mt: 2 }}
-                      >
-                        Generate Analysis
-                      </Button>
-                    </>
-                  )}
-                  {loading && <CircularProgress sx={{ mt: 2 }} />}
-                  {analysisResult && (
-                    <Box sx={{ mt: 2 }}>
-                      <Typography variant="h6">Analysis Result:</Typography>
-                      <Typography>{analysisResult}</Typography>
-                    </Box>
-                  )}
                 </Box>
               </Modal>
             </Box>
