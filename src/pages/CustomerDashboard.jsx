@@ -101,26 +101,28 @@ const CustomerDashboard = () => {
         </Grid>
 
         {/* NBA & Conversation Starter */}
-        <Grid item xs={12}>
+        <Grid item xs={12} md={6}>
           {trend && (
-            <>
-              <Card sx={{ mb: 3 }}>
-                <CardContent>
-                  <Typography variant="h6" color="primary" gutterBottom>
-                    Next Best Action (NBA)
-                  </Typography>
-                  <Typography>{trend.nba}</Typography>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" color="primary" gutterBottom>
-                    Conversation Starter
-                  </Typography>
-                  <Typography>{trend.conversationStarter}</Typography>
-                </CardContent>
-              </Card>
-            </>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" color="primary" gutterBottom>
+                  Next Best Action (NBA)
+                </Typography>
+                <Typography>{trend.nba}</Typography>
+              </CardContent>
+            </Card>
+          )}
+        </Grid>
+        <Grid item xs={12} md={6}>
+          {trend && (
+            <Card>
+              <CardContent>
+                <Typography variant="h6" color="primary" gutterBottom>
+                  Conversation Starter
+                </Typography>
+                <Typography>{trend.conversationStarter}</Typography>
+              </CardContent>
+            </Card>
           )}
         </Grid>
 
