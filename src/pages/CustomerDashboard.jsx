@@ -72,7 +72,7 @@ const CustomerDashboard = () => {
         </Grid>
 
         {/* Financial Trends */}
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12}>
           <Card>
             <CardContent>
               <Typography variant="h6">Financials</Typography>
@@ -101,7 +101,7 @@ const CustomerDashboard = () => {
         </Grid>
 
         {/* NBA & Conversation Starter */}
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12}>
           {trend && (
             <>
               <Card sx={{ mb: 3 }}>
